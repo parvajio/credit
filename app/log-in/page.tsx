@@ -40,7 +40,7 @@ const page = () => {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="shadcn" {...field} />
+                                        <Input placeholder="Your Email" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -54,7 +54,7 @@ const page = () => {
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="shadcn" {...field} />
+                                        <Input placeholder="Enter Password" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
