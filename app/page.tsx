@@ -13,7 +13,7 @@ export default function Home() {
           For $25 credit Bonus Sign in Now!!
         </p>
         <Button>
-          <Link href={"/signin"}>Sign In</Link>
+          <Link href={"/log-in"}>Sign In</Link>
         </Button>
       </div>
     </main>
