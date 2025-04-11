@@ -61,7 +61,7 @@ const page = () => {
                             )}
                         />
 
-                        <Button type='submit'>Sign Up</Button>
+                        <Button type='submit'>Log In</Button>
                     </form>
 
                 </FormProvider>
