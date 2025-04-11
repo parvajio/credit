@@ -4,7 +4,7 @@ import { signIn } from "@/auth";
 import { db } from "@/database/db";
 import { users } from "@/database/schema";
 import { hash } from "bcryptjs";
-import { eq, Param } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export const signInWithCredentioals = async (Params: Pick<AuthCredentials, "email" | "password">) => {
     const { email, password } = Params;

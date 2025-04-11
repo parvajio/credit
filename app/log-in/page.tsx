@@ -2,11 +2,14 @@
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { signInWithCredentioals } from '@/lib/action/auth'
 import { signInSchema } from '@/lib/formschema' 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 import { Form, FormProvider, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const page = () => {
@@ -18,11 +21,19 @@ const page = () => {
         },
     })
 
+    const router = useRouter()
+
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof signInSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+    async function onSubmit(values: z.infer<typeof signInSchema>) {
+        const result = await signInWithCredentioals(values);
+        
+        if(result.success){
+            toast.success("Logged in successfully");
+
+            router.push("/")
+        }else{
+            toast.error(result?.error || "Something went wrong")
+        }
     }
     return (
             <div className='flex flex-col justify-center gap-2 max-w-lg mx-auto min-h-screen'>
