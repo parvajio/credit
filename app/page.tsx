@@ -17,22 +17,22 @@ export default async function Home() {
           <>
             <p className="text-lg flex gap-1">
               Check current balance :
-              <Button variant="link" asChild>
-                <Link href="/profile">Profile</Link>
-              </Button>
+              <Link href="/profile">
+                <Button variant={"link"}>Profile</Button>
+              </Link>
             </p>
-            <Button asChild>
-              <Link href="/transactions">View Transactions</Link>
-            </Button>
+            <Link href="/transactions">
+              <Button>View Transactions</Button>
+            </Link>
           </>
         ) : (
           <>
             <p className="">
               Get $25 credit bonus when you sign up!
             </p>
-            <Button>
-              <Link href="/log-in">Sign In</Link>
-            </Button>
+            <Link href="/sign-up">
+              <Button>Sign Up</Button>
+            </Link>
           </>
         )}
       </div>
