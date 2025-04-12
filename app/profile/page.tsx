@@ -3,10 +3,19 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+interface UserData {
+    name: string
+    email: string
+    username?: string
+    creditBalance?: number
+    role: 'USER' | 'ADMIN'
+}
 
 export default function ProfilePage() {
     const { data: session } = useSession()
+    const [userData, setUserData] = useState<UserData | null>(null)
 
     if (!session) {
         return (
@@ -30,14 +39,14 @@ export default function ProfilePage() {
         if (!session) return
 
         const fetchUserData = async () => {
-            try {
-                const res = await fetch
-            } catch (err) {
+            const res = await fetch("/api/user")
 
-            }
+            if (!res.ok) throw new Error('Failed to fetch user data')
+
+            const data = await res.json()
+            setUserData(data);
         }
-
-        fetchUserData()
+        fetchUserData();
     }, [])
 
     return (
@@ -49,25 +58,25 @@ export default function ProfilePage() {
                 <CardContent className="space-y-4">
                     <div>
                         <h3 className="font-medium">Name</h3>
-                        <p>{session.user.name}</p>
+                        <p>{userData?.name}</p>
                     </div>
                     <div>
                         <h3 className="font-medium">Email</h3>
-                        <p>{session.user.email}</p>
+                        <p>{userData?.email}</p>
                     </div>
                     <div>
                         <h3 className="font-medium">Username</h3>
-                        <p>{session.user.username || 'Not set'}</p>
+                        <p>{userData?.username || 'Not set'}</p>
                     </div>
                     <div>
                         <h3 className="font-medium">Credit Balance</h3>
-                        <p>{session.user.creditBalance || 0} credits</p>
+                        <p>{userData?.creditBalance || 0} credits</p>
                     </div>
                     <div>
                         <h3 className="font-medium">Role</h3>
-                        <p>{session.user.role}</p>
+                        <p>{userData?.role}</p>
                     </div>
-                    {session.user.role === 'ADMIN' && (
+                    {userData?.role === 'ADMIN' && (
                         <Button asChild variant="outline">
                             <Link href="/admin/dashboard">Admin Dashboard</Link>
                         </Button>
