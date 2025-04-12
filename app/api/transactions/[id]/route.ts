@@ -1,46 +1,61 @@
-import { auth } from "@/auth"
-import { db } from "@/database/db"
-import { transactions, users } from "@/database/schema"
-import { eq, sql } from "drizzle-orm"
-import { NextResponse } from "next/server"
+// app/api/transactions/[id]/route.ts
+import { type NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { db } from '@/database/db'
+import { transactions, users } from '@/database/schema'
+import { eq, sql } from 'drizzle-orm'
+
+interface RouteContext {
+  params: {
+    id: string
+  }
+}
+
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  const { status } = await req.json()
-
   try {
-    // Start transaction
+    const session = await auth()
+    if (!session?.user?.id || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { status } = await request.json()
+
+    // Validate status
+    if (!status || !['APPROVED', 'REJECTED'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+
     await db.transaction(async (tx) => {
-      // First get the transaction to ensure it exists and get the userId
-      const [transaction] = await tx.select()
+      // Get transaction first
+      const [transaction] = await tx
+        .select()
         .from(transactions)
-        .where(eq(transactions.id, params.id))
+        .where(eq(transactions.id, context.params.id))
         .limit(1)
 
       if (!transaction) {
-        throw new Error("Transaction not found")
+        throw new Error('Transaction not found')
       }
 
-      // Update transaction status
-      await tx.update(transactions)
-        .set({ 
+      // Update transaction
+      await tx
+        .update(transactions)
+        .set({
           status,
-          processedAt: new Date()
+          processedAt: new Date(),
         })
-        .where(eq(transactions.id, params.id))
+        .where(eq(transactions.id, context.params.id))
 
-      // If approved, update user's credit balance
-      if (status === "APPROVED") {
-        await tx.update(users)
+      // Update user balance if approved
+      if (status === 'APPROVED') {
+        await tx
+          .update(users)
           .set({
-            creditBalance: sql`${users.creditBalance} + ${transaction.amount}`
+            creditBalance: sql`${users.creditBalance} + ${transaction.amount}`,
           })
           .where(eq(users.id, transaction.userId!))
       }
@@ -48,9 +63,9 @@ export async function PATCH(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Transaction update error:", error)
+    console.error('Transaction update error:', error)
     return NextResponse.json(
-      { error: "Failed to update transaction" },
+      { error: 'Failed to update transaction' },
       { status: 500 }
     )
   }
