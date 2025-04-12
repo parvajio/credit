@@ -44,46 +44,46 @@ export default function AdminDashboardPage() {
     console.log(transactions)
 
     const handleApprove = async (id: string) => {
-        // try {
-        //     const res = await fetch(`/api/transactions/${id}`, {
-        //         method: 'PATCH',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ status: 'APPROVED' }),
-        //     })
+        try {
+            const res = await fetch(`/api/transactions/admin/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'APPROVED' }),
+            })
 
-        //     if (!res.ok) throw new Error('Approval failed')
+            if (!res.ok) throw new Error('Approval failed')
 
-        //     setTransactions(transactions.map(tx =>
-        //         tx.id === id ? { ...tx, status: 'APPROVED', processedAt: new Date().toISOString() } : tx
-        //     ))
-        //     toast.success("Transaction approved")
-        // } catch (error) {
-        //     toast.error('Failed to approve transaction')
+            setTransactions(transactions.map(tx =>
+                tx.id === id ? { ...tx, status: 'APPROVED', processedAt: new Date().toISOString() } : tx
+            ))
+            toast.success("Transaction approved")
+        } catch (error) {
+            toast.error('Failed to approve transaction')
 
-        // }
+        }
     }
 
     const handleReject = async (id: string) => {
-        // try {
-        //     const res = await fetch(`/api/transactions/${id}`, {
-        //         method: 'PATCH',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ status: 'REJECTED' }),
-        //     })
+        try {
+            const res = await fetch(`/api/transactions/admin/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'REJECTED' }),
+            })
 
-        //     if (!res.ok) throw new Error('Rejection failed')
+            if (!res.ok) throw new Error('Rejection failed')
 
-        //     setTransactions(transactions.map(tx =>
-        //         tx.id === id ? { ...tx, status: 'REJECTED', processedAt: new Date().toISOString() } : tx
-        //     ))
-        //     toast.success('Transaction rejected')
-        // } catch (error) {
-        //     toast.error('Failed to reject transaction')
-        // }
+            setTransactions(transactions.map(tx =>
+                tx.id === id ? { ...tx, status: 'REJECTED', processedAt: new Date().toISOString() } : tx
+            ))
+            toast.success('Transaction rejected')
+        } catch (error) {
+            toast.error('Failed to reject transaction')
+        }
     }
 
     if (session?.user.role !== 'ADMIN') {

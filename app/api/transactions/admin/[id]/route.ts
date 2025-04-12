@@ -5,90 +5,60 @@ import { eq, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
-    req: NextRequest,
-    context: { params: Promise<{ id: string }> } // note: params is a Promise
+//   req: NextRequest,
+//   { params }: { params: { id: string } } 
+req: NextRequest,
+  {params}:{ params: Promise<{ id: string }> }
 ) {
-    const session = await auth();
+  const session = await auth();
 
-    if (!session?.user?.id || session.user.role !== "ADMIN") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { status } = await req.json();
+
+  if (!["APPROVED", "REJECTED"].includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
+
+  try {
+    // 1. First get the transaction
+    const [transaction] = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.id, (await params).id))
+      .limit(1);
+
+    if (!transaction) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
     }
 
-    const { status } = await req.json()
+    // 2. Update transaction status
+    await db
+      .update(transactions)
+      .set({
+        status,
+        processedAt: new Date(),
+      })
+      .where(eq(transactions.id, (await params).id));
 
-    try {
-        await db.transaction(async (tx) => {
-            await tx.update(transactions)
-                .set({
-                    status,
-                    processedAt: new Date()
-                })
-                .where(eq(transactions.id, (await context.params).id))
-
-            if (status == "APPROVED") {
-                const transaction = await tx.query.transactions.findFirst({
-                    where: eq(transactions.id, (await context.params).id)
-                })
-                if (transaction) {
-                    await tx.update(users)
-                    .set({
-                        creditBalance: sql`${users.creditBalance} + ${transaction.amount}`
-                    })
-                    .where(eq(users.id, transaction.userId!))
-                }
-            }
-
+    // 3. Update user balance if approved
+    if (status === "APPROVED") {
+      await db
+        .update(users)
+        .set({
+          creditBalance: sql`${users.creditBalance} + ${transaction.amount}`,
         })
-
-        return NextResponse.json({success: true});
-    } catch (error) {
-        return NextResponse.json({error: "Failed to update transaction"}, {status: 500})
+        .where(eq(users.id, transaction.userId!));
     }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Transaction update error:", error);
+    return NextResponse.json(
+      { error: "Failed to update transaction" },
+      { status: 500 }
+    );
+  }
 }
-
-// export async function PATCH(
-//   req: Request,
-//   { params }: { params: { id: string } }
-// ) {
-//   const session = await auth()
-//   if (!session?.user?.id || session.user.role !== "ADMIN") {
-//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//   }
-
-//   const { status } = await req.json()
-
-//   try {
-//     // Start transaction
-//     await db.transaction(async (tx) => {
-//       // Update transaction status
-//       await tx.update(transactions)
-//         .set({
-//           status,
-//           processedAt: new Date()
-//         })
-//         .where(eq(transactions.id, params.id))
-
-//       // If approved, update user's credit balance
-//       if (status === "APPROVED") {
-//         const transaction = await tx.query.transactions.findFirst({
-//           where: eq(transactions.id, params.id)
-//         })
-
-//         if (transaction) {
-//           await tx.update(users)
-//             .set({
-//               creditBalance: db.sql`${users.creditBalance} + ${transaction.amount}`
-//             })
-//             .where(eq(users.id, transaction.userId))
-//         }
-//       }
-//     })
-
-//     return NextResponse.json({ success: true })
-//   } catch (error) {
-//     return NextResponse.json(
-//       { error: "Failed to update transaction" },
-//       { status: 500 }
-//     )
-//   }
-// }
