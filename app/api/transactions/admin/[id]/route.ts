@@ -4,9 +4,7 @@ import { transactions, users } from "@/database/schema";
 import { eq, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PATCH(
-//   req: NextRequest,
-//   { params }: { params: { id: string } } 
+export async function PATCH( 
 req: NextRequest,
   {params}:{ params: Promise<{ id: string }> }
 ) {
