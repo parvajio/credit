@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { db } from "@/database/db";
 import { users } from "@/database/schema";
 import { hash } from "bcryptjs";
@@ -66,3 +66,7 @@ export const signUp = async (params: AuthCredentials) => {
     return { success: false, error: "Sign up failed" };
   }
 };
+
+export async function handleSignOut() {
+  await signOut();
+}

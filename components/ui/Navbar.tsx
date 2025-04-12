@@ -1,5 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button'
+import { handleSignOut } from '@/lib/action/auth'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -27,8 +28,8 @@ export default function Navbar() {
               <Button variant="ghost" asChild>
                 <Link href="/profile">Profile</Link>
               </Button>
-              <form action="/api/auth/signout" method="POST">
-                <Button type="submit" variant="outline">
+              <form action={handleSignOut}>
+                <Button variant="outline">
                   Sign Out
                 </Button>
               </form>
