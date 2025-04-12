@@ -5,14 +5,18 @@ import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 // POST: Create transaction
-export async function POST(req: Request) {
-  const session = await auth()
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { amount, description } = await req.json()
+export async function POST(req: Request){
+  const session = await auth();
+
+  if(!session?.user?.id){
+    return NextResponse.json({error: "unauthorized"}, {status: 401})
+  }
+
+  const {amount, description} = await req.json();
 
   try {
-    const tx = await db.insert(transactions).values({
+    const tx =  await db.insert(transactions).values({
       userId: session.user.id,
       amount,
       description,
@@ -21,35 +25,55 @@ export async function POST(req: Request) {
 
     return NextResponse.json(tx[0])
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create transaction" }, { status: 500 })
+    return NextResponse.json({error:"Failed to create Transaction"}, {status: 500})
   }
 }
 
 // GET: List transactions
-export async function GET(req: Request) {
-  const session = await auth()
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
+export async function GET(request: Request) {
   try {
-    const isAdmin = session.user.role === "ADMIN"
+    const session = await auth();
     
-    const txs = isAdmin
-      ? await db.query.transactions.findMany({
-          with: {
-            user: {
-              columns: {
-                name: true,
-                email: true
-              }
-            }
-          }
-        })
-      : await db.query.transactions.findMany({
-          where: eq(transactions.userId, session.user.id)
-        })
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' }, 
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json(txs)
+    // const isAdmin = session.user.role === 'ADMIN';
+    
+    // // For admin: get all transactions with user info
+    // if (isAdmin) {
+    //   const allTransactions = await db.query.transactions.findMany({
+    //     with: {
+    //       user: {
+    //         columns: {
+    //           name: true,
+    //           email: true
+    //         }
+    //       }
+    //     },
+    //     orderBy: (transactions, { desc }) => [desc(transactions.createdAt)]
+    //   });
+    //   return NextResponse.json(allTransactions);
+    // }
+
+    // For regular users: get only their transactions
+    
+    const userTransactions = await db.query.transactions.findMany({
+      where: eq(transactions.userId, session.user.id),
+      // orderBy: (transactions, { desc }) => [desc(transactions.createdAt)]
+      orderBy: (transactions, {desc}) => [desc(transactions.createdAt)]
+    });
+
+    return NextResponse.json(userTransactions);
+
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch transactions" }, { status: 500 })
+    console.error('Failed to fetch transactions:', error);
+    return NextResponse.json(
+      { error: 'Failed to load transactions' },
+      { status: 500 }
+    );
   }
 }

@@ -8,12 +8,12 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Transaction = {
-  id: string
-  amount: number
-  status: 'PENDING' | 'APPROVED' | 'REJECTED'
-  createdAt: string
-  processedAt: string | null
-  description: string
+  id: string;
+  amount: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  processedAt: string | null;
+  description: string;
 }
 
 export default function TransactionsPage() {
