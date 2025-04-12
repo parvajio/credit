@@ -5,52 +5,46 @@ import { db } from '@/database/db'
 import { transactions, users } from '@/database/schema'
 import { eq, sql } from 'drizzle-orm'
 
-interface RouteContext {
+interface RouteParams {
   params: {
     id: string
   }
 }
 
-
-export async function PATCH(
-  request: NextRequest,
-  context: RouteContext
-) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    // Authentication check
     const session = await auth()
     if (!session?.user?.id || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Request validation
     const { status } = await request.json()
-
-    // Validate status
     if (!status || !['APPROVED', 'REJECTED'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 
+    // Database transaction
     await db.transaction(async (tx) => {
-      // Get transaction first
       const [transaction] = await tx
         .select()
         .from(transactions)
-        .where(eq(transactions.id, context.params.id))
+        .where(eq(transactions.id, params.id))
         .limit(1)
 
       if (!transaction) {
         throw new Error('Transaction not found')
       }
 
-      // Update transaction
       await tx
         .update(transactions)
         .set({
           status,
           processedAt: new Date(),
         })
-        .where(eq(transactions.id, context.params.id))
+        .where(eq(transactions.id, params.id))
 
-      // Update user balance if approved
       if (status === 'APPROVED') {
         await tx
           .update(users)
@@ -65,7 +59,7 @@ export async function PATCH(
   } catch (error) {
     console.error('Transaction update error:', error)
     return NextResponse.json(
-      { error: 'Failed to update transaction' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
