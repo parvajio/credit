@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { signInWithCredentioals } from '@/lib/action/auth'
+import { signInWithCredentials } from '@/lib/action/auth'
 import { signInSchema } from '@/lib/formschema' 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
@@ -25,7 +25,7 @@ const page = () => {
 
     // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof signInSchema>) {
-        const result = await signInWithCredentioals(values);
+        const result = await signInWithCredentials(values);
         
         if(result.success){
             toast.success("Logged in successfully");
