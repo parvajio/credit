@@ -11,6 +11,7 @@ import React from 'react'
 import { Form, FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { signIn } from 'next-auth/react';
 
 const page = () => {
     const form = useForm<z.infer<typeof signUpSchema>>({
@@ -32,8 +33,19 @@ const page = () => {
             const result = await signUp(values);
 
             if (result.success) {
-                toast.success("Logged in successfully");
-                router.push("/");
+                // Automatically sign in the user after successful sign-up
+                const signInResult = await signIn('credentials', {
+                    email: values.email,
+                    password: values.password,
+                    redirect: false,
+                });
+
+                if (signInResult?.ok) {
+                    toast.success("Sign up successfully");
+                    router.push("/");
+                } else {
+                    toast.error("Failed to log in after sign-up");
+                }
             } else {
                 toast.error(result?.error || "Something went wrong");
             }
