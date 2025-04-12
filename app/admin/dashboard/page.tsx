@@ -13,10 +13,8 @@ type Transaction = {
     createdAt: string
     processedAt: string | null
     description: string
-    user: {
-        name: string
-        email: string
-    }
+    userName: string
+    userEmail: string
 }
 
 export default function AdminDashboardPage() {
@@ -29,7 +27,7 @@ export default function AdminDashboardPage() {
 
         const fetchTransactions = async () => {
             try {
-                const res = await fetch('/api/transactions')
+                const res = await fetch('/api/transactions/admin')
                 if (!res.ok) throw new Error('Failed to fetch transactions')
                 const data = await res.json()
                 setTransactions(data)
@@ -43,47 +41,49 @@ export default function AdminDashboardPage() {
         fetchTransactions()
     }, [session])
 
+    console.log(transactions)
+
     const handleApprove = async (id: string) => {
-        try {
-            const res = await fetch(`/api/transactions/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: 'APPROVED' }),
-            })
+        // try {
+        //     const res = await fetch(`/api/transactions/${id}`, {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ status: 'APPROVED' }),
+        //     })
 
-            if (!res.ok) throw new Error('Approval failed')
+        //     if (!res.ok) throw new Error('Approval failed')
 
-            setTransactions(transactions.map(tx =>
-                tx.id === id ? { ...tx, status: 'APPROVED', processedAt: new Date().toISOString() } : tx
-            ))
-            toast.success("Transaction approved")
-        } catch (error) {
-            toast.error('Failed to approve transaction')
+        //     setTransactions(transactions.map(tx =>
+        //         tx.id === id ? { ...tx, status: 'APPROVED', processedAt: new Date().toISOString() } : tx
+        //     ))
+        //     toast.success("Transaction approved")
+        // } catch (error) {
+        //     toast.error('Failed to approve transaction')
 
-        }
+        // }
     }
 
     const handleReject = async (id: string) => {
-        try {
-            const res = await fetch(`/api/transactions/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: 'REJECTED' }),
-            })
+        // try {
+        //     const res = await fetch(`/api/transactions/${id}`, {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ status: 'REJECTED' }),
+        //     })
 
-            if (!res.ok) throw new Error('Rejection failed')
+        //     if (!res.ok) throw new Error('Rejection failed')
 
-            setTransactions(transactions.map(tx =>
-                tx.id === id ? { ...tx, status: 'REJECTED', processedAt: new Date().toISOString() } : tx
-            ))
-            toast.success('Transaction rejected')
-        } catch (error) {
-            toast.error('Failed to reject transaction')
-        }
+        //     setTransactions(transactions.map(tx =>
+        //         tx.id === id ? { ...tx, status: 'REJECTED', processedAt: new Date().toISOString() } : tx
+        //     ))
+        //     toast.success('Transaction rejected')
+        // } catch (error) {
+        //     toast.error('Failed to reject transaction')
+        // }
     }
 
     if (session?.user.role !== 'ADMIN') {
@@ -125,8 +125,9 @@ export default function AdminDashboardPage() {
                                 {transactions.filter(tx => tx.status === 'PENDING').map((tx) => (
                                     <TableRow key={tx.id}>
                                         <TableCell>
-                                            <div className="font-medium">{tx.user.name}</div>
-                                            <div className="text-sm text-gray-500">{tx.user.email}</div>
+                                        {/* {tx.userName} */}
+                                            <div className="font-medium">{tx.userName}</div>
+                                            <div className="text-sm text-gray-500">{tx.userEmail}</div>
                                         </TableCell>
                                         <TableCell>{tx.amount} credits</TableCell>
                                         <TableCell>{new Date(tx.createdAt).toLocaleString()}</TableCell>
