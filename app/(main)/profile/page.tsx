@@ -1,9 +1,9 @@
 "use client"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 
 interface UserData {
     name: string
@@ -13,9 +13,24 @@ interface UserData {
     role: 'USER' | 'ADMIN'
 }
 
+const fetchUserData = async (): Promise<UserData> => {
+    const res = await fetch("/api/user")
+    if (!res.ok) throw new Error('Failed to fetch user data')
+    return res.json()
+}
+
 export default function ProfilePage() {
-    const { data: session } = useSession()
-    const [userData, setUserData] = useState<UserData | null>(null)
+    const { data: session, status } = useSession()
+
+    const { data: userData, isLoading, error } = useQuery({
+        queryKey: ['userData'],
+        queryFn: fetchUserData,
+        enabled: !!session,
+    })
+
+    if (status === "loading") {
+        return <p className="p-4">Loading session...</p>
+    }
 
     if (!session) {
         return (
@@ -35,19 +50,13 @@ export default function ProfilePage() {
         )
     }
 
-    useEffect(() => {
-        if (!session) return
+    if (isLoading) {
+        return <p className="p-4">Loading profile...</p>
+    }
 
-        const fetchUserData = async () => {
-            const res = await fetch("/api/user")
-
-            if (!res.ok) throw new Error('Failed to fetch user data')
-
-            const data = await res.json()
-            setUserData(data);
-        }
-        fetchUserData();
-    }, [])
+    if (error) {
+        return <p className="p-4 text-red-500">Error loading profile.</p>
+    }
 
     return (
         <div className="max-w-7xl mx-auto p-4">
