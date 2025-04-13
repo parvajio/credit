@@ -2,7 +2,6 @@
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { signInWithCredentials } from '@/lib/action/auth'
 import { signInSchema } from '@/lib/formschema' 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
@@ -11,6 +10,7 @@ import React from 'react'
 import { Form, FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { signIn } from "next-auth/react";
 
 const page = () => {
     const form = useForm<z.infer<typeof signInSchema>>({
@@ -24,16 +24,20 @@ const page = () => {
     const router = useRouter()
 
     async function onSubmit(values: z.infer<typeof signInSchema>) {
-        const result = await signInWithCredentials(values);
+        const result = await signIn("credentials", {
+            email: values.email,
+            password: values.password,
+            redirect: false, // Prevent automatic redirection
+        });
 
-        if (result.success) {
+        if (result?.ok) {
             toast.success("Logged in successfully");
 
-            // Force session update and refresh the page
+            // Force session update and navigate to the home page
             router.refresh();
             router.push("/");
         } else {
-            toast.error(result?.error || "Something went wrong");
+            toast.error(result?.error || "Invalid credentials");
         }
     }
 
