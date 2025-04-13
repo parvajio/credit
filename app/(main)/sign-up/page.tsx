@@ -64,7 +64,7 @@ const page = () => {
                 <p className='text-gray-600'>Sign Up to create Credit Account</p>
             </div>
             <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 justify-center'>
+                <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 justify-center mx-5'>
 
                     {/* name */}
                     <FormField

@@ -43,12 +43,12 @@ const page = () => {
 
     return (
             <div className='flex flex-col justify-center gap-2 max-w-lg mx-auto min-h-screen'>
-                <div className='flex flex-col items-center justify-center mb-10'>
+                <div className='flex flex-col items-center justify-center mb-5'>
                     <h1 className='text-2xl font-bold'>Log in</h1>
                     <p className='text-gray-600'>Log in to access Account</p>
                 </div>
                 <FormProvider {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 justify-center'>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 justify-center mx-5'>
                         {/* email  */}
                         <FormField
                             control={form.control}
