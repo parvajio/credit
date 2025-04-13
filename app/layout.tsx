@@ -2,10 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
-import { SessionProvider } from "next-auth/react"
-import { auth } from "@/auth"
-import { Session } from "next-auth"
-import Navbar from "@/components/Navbar"
+import Providers from "./providers"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,22 +19,17 @@ export const metadata: Metadata = {
   description: "Manage your credit transactions",
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
-  const session: Session | null = await auth(); // Apply the Session type
+}) {
   return (
     <html lang="en">
-      <SessionProvider session={session}>
-
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Navbar />
-        {children}
+        <Providers>{children}</Providers>
         <Toaster />
       </body>
-      </SessionProvider>
     </html>
   )
 }
