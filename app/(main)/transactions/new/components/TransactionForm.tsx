@@ -55,6 +55,7 @@ export default function TransactionForm() {
               <FormControl>
                 <Input
                   type="number"
+                  placeholder="Enter amount in credits"
                   {...field}
                   onChange={(e) => field.onChange(parseInt(e.target.value))}
                 />
@@ -70,7 +71,7 @@ export default function TransactionForm() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input placeholder="Enter short description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
