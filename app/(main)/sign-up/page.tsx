@@ -34,7 +34,7 @@ const page = () => {
 
             if (result.success) {
                 // Automatically sign in the user after successful sign-up
-                const signInResult = await signIn('credentials', {
+                const signInResult = await signIn("credentials", {
                     email: values.email,
                     password: values.password,
                     redirect: false,
@@ -42,6 +42,9 @@ const page = () => {
 
                 if (signInResult?.ok) {
                     toast.success("Sign up successfully");
+
+                    // Force session update and refresh the page
+                    router.refresh();
                     router.push("/");
                 } else {
                     toast.error("Failed to log in after sign-up");

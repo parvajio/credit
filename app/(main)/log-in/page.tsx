@@ -23,18 +23,20 @@ const page = () => {
 
     const router = useRouter()
 
-    // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof signInSchema>) {
         const result = await signInWithCredentials(values);
-        
-        if(result.success){
+
+        if (result.success) {
             toast.success("Logged in successfully");
 
-            router.push("/")
-        }else{
-            toast.error(result?.error || "Something went wrong")
+            // Force session update and refresh the page
+            router.refresh();
+            router.push("/");
+        } else {
+            toast.error(result?.error || "Something went wrong");
         }
     }
+
     return (
             <div className='flex flex-col justify-center gap-2 max-w-lg mx-auto min-h-screen'>
                 <div className='flex flex-col items-center justify-center mb-10'>
@@ -83,8 +85,7 @@ const page = () => {
                         <Link href={"/sign-up"}>Sign Up</Link>
                     </Button>
                 </div>
-            </div>
+         </div>
     )
 }
-
-export default page
+export default page;

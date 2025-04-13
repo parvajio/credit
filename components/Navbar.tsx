@@ -1,15 +1,11 @@
-"use client"
-import { Button } from '@/components/ui/button'
-import { handleSignOut } from '@/lib/action/auth'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function Navbar() {
-  const { data: session, status } = useSession()
-  const pathname = usePathname()
-
-  if (pathname === '/log-in' || pathname === '/sign-up') return null
+  const { data: session, status } = useSession();
 
   return (
     <header className="border-b">
@@ -18,7 +14,7 @@ export default function Navbar() {
           Credit System
         </Link>
         <nav className="flex items-center gap-4">
-          {status === 'loading' ? (
+          {status === "loading" ? (
             <div>Loading...</div>
           ) : session ? (
             <>
@@ -28,11 +24,15 @@ export default function Navbar() {
               <Button variant="ghost" asChild>
                 <Link href="/profile">Profile</Link>
               </Button>
-              <form action={handleSignOut}>
-                <Button variant="outline">
-                  Sign Out
-                </Button>
-              </form>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  await signOut({ redirect: false }); // Sign out without redirect
+                  window.location.reload(); // Refresh the page to update the UI
+                }}
+              >
+                Sign Out
+              </Button>
             </>
           ) : (
             <>
@@ -47,5 +47,5 @@ export default function Navbar() {
         </nav>
       </div>
     </header>
-  )
+  );
 }
