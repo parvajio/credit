@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react"
 import { auth } from "@/auth"
 import { Session } from "next-auth"
-import Navbar from "@/components/ui/Navbar"
+import Navbar from "@/components/Navbar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
