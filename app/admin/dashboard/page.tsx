@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-4">
+        <div className="max-w-7xl mx-auto p-4 space-y-5">
             <Card>
                 <CardHeader>
                     <CardTitle>Pending Transactions</CardTitle>
@@ -111,6 +111,8 @@ export default function AdminDashboardPage() {
                     {loading ? (
                         <div>Loading...</div>
                     ) : (
+
+                        // panding
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -118,6 +120,7 @@ export default function AdminDashboardPage() {
                                     <TableHead>Amount</TableHead>
                                     <TableHead>Date</TableHead>
                                     <TableHead>Description</TableHead>
+                                    <TableHead>Starus</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -125,13 +128,18 @@ export default function AdminDashboardPage() {
                                 {transactions.filter(tx => tx.status === 'PENDING').map((tx) => (
                                     <TableRow key={tx.id}>
                                         <TableCell>
-                                        {/* {tx.userName} */}
+                                            {/* {tx.userName} */}
                                             <div className="font-medium">{tx.userName}</div>
                                             <div className="text-sm text-gray-500">{tx.userEmail}</div>
                                         </TableCell>
                                         <TableCell>{tx.amount} credits</TableCell>
                                         <TableCell>{new Date(tx.createdAt).toLocaleString()}</TableCell>
-                                        <TableCell>{tx.description}</TableCell>
+                                        <TableCell>{tx.description.length > 15 ? ` ${tx.description.slice(0, 15)}... ` : tx.description}</TableCell>
+                                        <TableCell>
+                                            <span className={`px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800`}>
+                                                {tx.status}
+                                            </span>
+                                        </TableCell>
                                         <TableCell className="flex gap-2">
                                             <Button size="sm" onClick={() => handleApprove(tx.id)}>Approve</Button>
                                             <Button size="sm" variant="destructive" onClick={() => handleReject(tx.id)}>
@@ -142,6 +150,56 @@ export default function AdminDashboardPage() {
                                 ))}
                             </TableBody>
                         </Table>
+
+
+
+                    )}
+                </CardContent>
+            </Card>
+            {/* approved */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Approved Transactions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div>Loading...</div>
+                    ) : (
+
+
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>User</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {transactions.filter(tx => tx.status === 'APPROVED').map((tx) => (
+                                    <TableRow key={tx.id}>
+                                        <TableCell>
+                                            {/* {tx.userName} */}
+                                            <div className="font-medium">{tx.userName}</div>
+                                            <div className="text-sm text-gray-500">{tx.userEmail}</div>
+                                        </TableCell>
+                                        <TableCell>{tx.amount} credits</TableCell>
+                                        <TableCell>{new Date(tx.createdAt).toLocaleString()}</TableCell>
+                                        <TableCell>{tx.description.length > 15 ? ` ${tx.description.slice(0, 15)}... ` : tx.description}</TableCell>
+                                        <TableCell>
+                                            <span className={`px-2 py-1 rounded-full text-xs bg-green-100 text-green-800`}>
+                                                {tx.status}
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+
+
+
                     )}
                 </CardContent>
             </Card>
