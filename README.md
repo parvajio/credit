@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💳 Credit System
 
-## Getting Started
+A full-stack credit management application with secure authentication, transaction processing, and admin approval workflows.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 🔐 Authentication
+- Secure sign-up/login with email/password
+- Role-based authorization (User/Admin)
+- Protected routes and API endpoints
+- Session management with JWT
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 💰 Transactions
+- Submit credit transfer requests
+- Real-time status tracking (Pending/Approved/Rejected)
+- Automatic credit balance updates
+- Transaction history with filters
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 👨‍💻 Admin Dashboard
+- Approve/reject pending transactions
+- View all user transactions
+- User management controls
+- Audit logs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🎨 UI/UX
+- Responsive design with Tailwind CSS
+- Dark/light mode support
+- Form validation with Zod
+- Toast notifications
+- Loading states
 
-## Learn More
+## 🛠 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| Next.js 15 | React framework |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling |
+| Shadcn/ui | Component library |
+| TanStack Query | Data fetching |
+| NextAuth.js | Authentication |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| Drizzle ORM | Database toolkit |
+| PostgreSQL | Database |
+| Neon | Serverless Postgres |
+| Zod | Data validation |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Prerequisites
+- Node.js v18+
+- PostgreSQL database
+- npm/yarn/pnpm
