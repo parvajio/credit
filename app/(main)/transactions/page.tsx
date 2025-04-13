@@ -2,9 +2,10 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 type Transaction = {
@@ -16,27 +17,24 @@ type Transaction = {
   description: string;
 }
 
+const fetchTransactions = async (): Promise<Transaction[]> => {
+  const res = await fetch('/api/transactions')
+  if (!res.ok) throw new Error('Failed to fetch transactions')
+  return res.json()
+}
+
 export default function TransactionsPage() {
   const { data: session } = useSession()
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(true)
+
+  const { data: transactions, isLoading, isError } = useQuery({
+    queryKey: ["transactions"],
+    queryFn: fetchTransactions,
+    enabled: !!session,
+  })
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await fetch('/api/transactions')
-        if (!res.ok) throw new Error('Failed to fetch transactions')
-        const data = await res.json()
-        setTransactions(data)
-      } catch (error) {
-        toast.error('Error loading transactions')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchTransactions()
-  }, [])
+    if (isError) toast.error("Failed to load transactions")
+  }, [isError])
 
   return (
     <div className="max-w-7xl mx-auto p-4">
@@ -48,8 +46,10 @@ export default function TransactionsPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <div>Loading...</div>
+          ) : isError ? (
+            <p className="text-red-500">Something went wrong.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -61,7 +61,7 @@ export default function TransactionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((tx) => (
+                {transactions?.map((tx) => (
                   <TableRow key={tx.id}>
                     <TableCell>{tx.amount} credits</TableCell>
                     <TableCell>
@@ -74,7 +74,7 @@ export default function TransactionsPage() {
                       </span>
                     </TableCell>
                     <TableCell>{new Date(tx.createdAt).toLocaleString()}</TableCell>
-                    <TableCell>{tx.description}</TableCell>
+                    <TableCell>{tx.description.length > 15 ? ` ${tx.description.slice(0, 15)}... ` : tx.description}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
